@@ -8,6 +8,7 @@ connection.connect(err => {
   queryAllProducts();
 });
 
+//find all products and print their values
 function queryAllProducts() {
   connection.query("SELECT * FROM products", (err, res) => {
     for (var i = 0; i < res.length; i++) {
@@ -18,6 +19,14 @@ function queryAllProducts() {
     }
     inquire();
   });
+}
+
+//find a specific product by Id
+function queryId(chooseId) {
+  connection.query(`SELECT * FROM products WHERE item_id=${chooseId}`, (err, res) => {
+    console.log(res)
+    console.log(res[0].stock_quantity)
+  })
 }
 function inquire() {
   inquirer
@@ -35,5 +44,7 @@ function inquire() {
     ])
     .then(response => {
       console.log(response.chooseId + response.chooseAmount);
+      queryId(response.chooseId);
+
     });
 }
