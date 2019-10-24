@@ -22,12 +22,35 @@ function queryAllProducts() {
 }
 
 //find a specific product by Id
-function queryId(chooseId) {
+function queryId(chooseId, chooseAmount) {
   connection.query(`SELECT * FROM products WHERE item_id=${chooseId}`, (err, res) => {
-    console.log(res)
-    console.log(res[0].stock_quantity)
-  })
+    let stock_quantity = res[0].stock_quantity;
+
+    if (chooseAmount <= stock_quantity) {
+      //Complete transaction
+      let newStock = stock_quantity - chooseAmount;
+      let total = res[0].price * chooseAmount;
+      connection.query(
+        `
+      UPDATE products SET ? WHERE item_id=${chooseId}`,
+        [
+          {
+            stock_quantity: newStock
+          }
+        ],
+        error => {
+          if (error) throw error;
+          console.log(
+            `Congratulations you've purchased ${chooseAmount} ${res[0].product_name} for $${total}`
+          );
+        }
+      );
+    } else {
+      return console.log("Insufficient quantity!");
+    }
+  });
 }
+
 function inquire() {
   inquirer
     .prompt([
@@ -44,7 +67,6 @@ function inquire() {
     ])
     .then(response => {
       console.log(response.chooseId + response.chooseAmount);
-      queryId(response.chooseId);
-
+      queryId(response.chooseId, response.chooseAmount);
     });
 }
