@@ -49,6 +49,7 @@ function queryId(chooseId, chooseAmount) {
       return console.log("Insufficient quantity!");
     }
   });
+  inquire();
 }
 
 function inquire() {
@@ -66,7 +67,24 @@ function inquire() {
       }
     ])
     .then(response => {
-      console.log(response.chooseId + response.chooseAmount);
       queryId(response.chooseId, response.chooseAmount);
+    })
+    .then(resp => {
+      inquirer
+        .prompt([
+          {
+            type: "list",
+            message: "Make another purchase?",
+            choices: ["yes", "no"],
+            name: "again"
+          }
+        ])
+        .then(res => {
+          if (res.again === "yes") {
+            inquire();
+          } else {
+            process.exit();
+          }
+        });
     });
 }
